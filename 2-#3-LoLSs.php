@@ -14,6 +14,17 @@
 
 class Solution {
 
+    function findMaxLength($arr) {
+        $maxUniqueStr = "";
+        $maxUniqueStrLen = 0;
+  
+        foreach($arr as $uniqueStr) {
+            $cStrLen = strlen($uniqueStr);
+            $maxUniqueStrLen = ($cStrLen > $maxUniqueStrLen) ? $cStrLen : $maxUniqueStrLen;
+        }
+        return $maxUniqueStrLen;
+    }
+  
     /**
      * @param String $s, where s can be empty str, a space, [a-z][A-Z], [0-9], & symbols
      * @return Integer
@@ -42,33 +53,58 @@ class Solution {
         if(strlen($s) == 0) {
             return 0;
         }
-        $tmpStr = "";
+  
         //let's get the string (s) chars into an array
-        $strArr = str_split($s);
         $uniqueStrs = array();
-        $maxLengths = array();
-        $maxLength = 0;
-
-        foreach($strArr as $char) {
+        $tmpStr = "";
+        
+        // $maxLengths = array();
+        // $maxLength = 0;
+  
+        //let's keep track of prev char
+        $prevChar = "";
+        
+        $strArr = str_split($s);
+        foreach($strArr as $ind => $char) {
             //if(!in_array($char, $uniqueStrs)) {
-            if(stristr($char, $tmpStr)) {
-                $maxLength++;
-                array_push($uniqueStrs, $char);
+            if(stristr($tmpStr, $char) === FALSE) {
+                $tmpStr .= $char;
+                // $maxLength++;
             } else {
-
+                array_push($uniqueStrs, $tmpStr);
+                // array_push($maxLengths, $maxLength);
+  
                 //reset maxLength... as non-unique char was detected and we still might have more chars to iterate through...
-                $maxLength = 1;
+                // $maxLength = 1;
                 //also, reset the uniqueStr arr
                 //$uniqueStrs = array();
+  
+                if($prevChar == $char) {
+                    $tmpStr = $char;
+                    // $maxLength = 1;
+                } else {
+                    $tmpStr = $prevChar.$char;
+                    // $maxLength = 2;
+                }
+  
             }
+            $prevChar = $char;
             //add the current maxLength to the maxLengths array
-            array_push($maxLengths, $maxLength);
+            // array_push($maxLengths, $maxLength);
             //if the current maxLength is not in the maxLengths array, add it...
+            //in case there are no more chars, let's add the current tmpStr to the uniqueStrs array...
+            if(!isset($strArr[$ind+1])) {
+                array_push($uniqueStrs, $tmpStr);
+                // array_push($maxLengths, $maxLength);
+            }
         }
         //echo "Max: ".max($maxLengths);
-
+  
         //now, we return the max value from the array that kept track of unique substr without repeat
-        return max($maxLengths);
+        // return max($maxLengths);
+  
+        //mixing in some DP
+        return $this->findMaxLength($uniqueStrs);
     }
 }
 
